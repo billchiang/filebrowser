@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/filebrowser/filebrowser/v2/rules"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/spf13/afero"
 )
 
@@ -17,7 +18,6 @@ type searchOptions struct {
 // Search searches for a query in a fs.
 func Search(fs afero.Fs, scope, query string, checker rules.Checker, found func(path string, f os.FileInfo) error) error {
 	search := parseSearch(query)
-
 	scope = strings.Replace(scope, "\\", "/", -1)
 	scope = strings.TrimPrefix(scope, "/")
 	scope = strings.TrimSuffix(scope, "/")
@@ -28,7 +28,6 @@ func Search(fs afero.Fs, scope, query string, checker rules.Checker, found func(
 		originalPath = strings.TrimPrefix(originalPath, "/")
 		originalPath = "/" + originalPath
 		path := originalPath
-
 		if path == scope {
 			return nil
 		}
@@ -58,7 +57,7 @@ func Search(fs afero.Fs, scope, query string, checker rules.Checker, found func(
 
 		if len(search.Terms) > 0 {
 			for _, term := range search.Terms {
-				if strings.Contains(path, term) {
+				if fuzzy.Match(term, path) {
 					return found(strings.TrimPrefix(originalPath, scope), f)
 				}
 			}
