@@ -23,8 +23,10 @@ var searchReqHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *
 			Expand:  true,
 			Checker: d,
 		})
-		filesResponse = append(filesResponse, file)
 
+		if file != nil {
+			filesResponse = append(filesResponse, file)
+		}
 		return nil
 	})
 	//gen a dir from root to
@@ -37,10 +39,13 @@ var searchReqHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *
 	})
 	dirab.Listing.Items = filesResponse
 	dirab.Listing.Sorting = d.user.Sorting
+	dirab.NumDirs = 1
+	dirab.NumFiles = len(dirab.Listing.Items)
 	dirab.Listing.ApplySort()
 
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
+
 	return renderJSON(w, r, dirab)
 })
