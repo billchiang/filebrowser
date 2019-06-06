@@ -45,5 +45,6 @@ var searchReqHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *
 		}
 		return renderJSON(w, r, searchReq)
 	}
-	return renderJSON(w, r, items)
+	empty := []map[string]interface{}{}
+	return renderJSON(w, r, empty)
 })
